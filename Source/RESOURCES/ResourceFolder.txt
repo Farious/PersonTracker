@@ -1,0 +1,1 @@
+This folder should hold all the files needed for the program, e.g.: Detections\ReIdent\dataset\etc.
