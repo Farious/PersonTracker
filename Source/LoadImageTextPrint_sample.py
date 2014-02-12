@@ -11,9 +11,9 @@ thickness = 8
 
 frame = 26
 
-user = "dario" # "Toshiba"
-datasetpath = "C:\Users\\" + user + "\Desktop\Dropbox\Work\HDA_Dataset\VideoSequences\JPEG\camera60\\"
-# datasetpath = "C:\Users\Toshiba\Desktop\Dropbox\Work\HDA_Dataset\VideoSequences\JPEG\camera60\\"
+# user = "dario" # "Toshiba"
+# datasetpath = "C:\Users\\" + user + "\Desktop\Dropbox\Work\HDA_Dataset\VideoSequences\JPEG\camera60\\"
+datasetpath = "RESOURCES\\"
 filename = "I000" + str(frame) + ".jpeg"
 image = cv2.imread(datasetpath + filename) 
 
@@ -23,8 +23,10 @@ cv2.resizeWindow("1", 2560/2, 1600/2)
 ##cv2.imshow("1",image)
 ##cv2.waitKey(0)
 
-detectionspath = "C:\\Users\\" + user + "\Desktop\Dropbox\Work\DemoHDA\\7.0.SmallLimited\\"
-detectionfile = "\set60\V000\I000" + str(frame) + ".txt"
+# detectionspath = "C:\\Users\\" + user + "\Desktop\Dropbox\Work\DemoHDA\\7.0.SmallLimited\\"
+# detectionfile = "\set60\V000\I000" + str(frame) + ".txt"
+detectionspath = "RESOURCES\\"
+detectionfile = "I000" + str(frame) + ".txt"
 
 line = 'place-holder'
 ind = 1
