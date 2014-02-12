@@ -2,9 +2,12 @@
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkListStore" id="PersonList"/>
+  <object class="GtkListStore" id="VideoList"/>
   <object class="GtkWindow" id="TrackerMainWindow">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">PersonTracker</property>
+    <signal name="destroy" handler="gtk_main_quit" swapped="no"/>
     <child>
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
@@ -79,6 +82,7 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
+                        <signal name="activate" handler="gtk_main_quit" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -195,7 +199,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkDrawingArea" id="drawingarea1">
+                      <object class="GtkDrawingArea" id="videoCanvas">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                       </object>
@@ -376,17 +380,23 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkExpander" id="expander1">
+                  <object class="GtkExpander" id="personChooserXP">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <child>
-                      <placeholder/>
+                      <object class="GtkIconView" id="personListing">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="selection_mode">multiple</property>
+                        <property name="model">PersonList</property>
+                      </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="label4">
+                      <object class="GtkLabel" id="personChooserXPLbl">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">expander</property>
+                        <property name="xalign">0.4699999988079071</property>
+                        <property name="label" translatable="yes">Person Chooser</property>
                       </object>
                     </child>
                   </object>
@@ -397,17 +407,21 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkExpander" id="expander2">
+                  <object class="GtkExpander" id="videoChooserXP">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <child>
-                      <placeholder/>
+                      <object class="GtkIconView" id="videoListing">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="model">VideoList</property>
+                      </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="label5">
+                      <object class="GtkLabel" id="videoChooserXPLbl">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">expander</property>
+                        <property name="label" translatable="yes">Video Chooser</property>
                       </object>
                     </child>
                   </object>
@@ -418,17 +432,20 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkExpander" id="expander3">
+                  <object class="GtkExpander" id="statsXP">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child type="label">
-                      <object class="GtkLabel" id="label6">
+                      <object class="GtkDrawingArea" id="statsCanvas">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">expander</property>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel" id="statsXPLbl">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Statistics</property>
                       </object>
                     </child>
                   </object>
