@@ -1,19 +1,19 @@
-import numpy as np
+# import numpy as np
 import cv2
-import linecache
+# import linecache
 import LoadImagePrintText as f
 # >>> import os
 # >>> os.chdir("C:\Users\dario\Desktop\Dropbox\Work\DemoHDA\git\Source\\")
 
 ## Input
 cam = 60
-frame = 27
+frame = 26
 debugREID = 1
 
-img = f.loadImagePrintText(cam, frame, debugREID=1)
+img = f.loadImagePrintText(cam, frame, debugREID=1, debugPD=1)
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("1", 2560/2, 1600/2)
+cv2.resizeWindow("1", 2560/4, 1600/4)
 cv2.imshow("1",img)
 cv2.waitKey(0)
 
