@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 __author__ = 'Fábio'
-import wx
+import wx, numpy as np
 
 try:
     from wx import glcanvas
@@ -33,10 +33,17 @@ except ImportError:
 
 # Class defining the base OpenGL Canvas
 class MyCanvasBase(glcanvas.GLCanvas):
-    def __init__(self, parent, image):
-        self.image = image
+    def __init__(self, parent):
+        # Empty image
+        self.image = np.zeros((200, 200, 3), np.uint8)
+
+        # GLCanvas constructor
         glcanvas.GLCanvas.__init__(self, parent, -1)
+
+        # Bool indicating if this was correctly initialized
         self.init = False
+
+        # OpenGL Context
         self.context = glcanvas.GLContext(self)
 
         # Mouse position logic
@@ -46,6 +53,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         # Canvas size
         self.size = None
 
+        # Event Binding
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -69,8 +77,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         dc = wx.PaintDC(self)
         self.SetCurrent(self.context)
         if not self.init:
-            self.InitGL(self.image)
-            self.init = True
+            self.InitGL()
         self.OnDraw()
 
     def OnMouseDown(self, evt):
@@ -88,9 +95,9 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
 
 class QuadCanvas(MyCanvasBase):
-    def InitGL(self, image):
+    def InitGL(self):
         self.init = True
-        self.imageID = self.loadImage(image)
+        self.imageID = self.loadImage(self.image)
 
         # set viewing projection
         glMatrixMode(GL_PROJECTION)

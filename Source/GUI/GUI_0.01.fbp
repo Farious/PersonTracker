@@ -267,8 +267,8 @@
                                     <property name="vgap">0</property>
                                     <object class="sizeritem" expanded="1">
                                         <property name="border">5</property>
-                                        <property name="flag">wxALL|wxEXPAND</property>
-                                        <property name="proportion">2</property>
+                                        <property name="flag">wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</property>
+                                        <property name="proportion">5</property>
                                         <object class="wxBoxSizer" expanded="1">
                                             <property name="minimum_size"></property>
                                             <property name="name">playerBox</property>
@@ -356,7 +356,7 @@
                                             </object>
                                             <object class="sizeritem" expanded="1">
                                                 <property name="border">5</property>
-                                                <property name="flag">wxEXPAND</property>
+                                                <property name="flag">wxEXPAND|wxALIGN_CENTER_HORIZONTAL</property>
                                                 <property name="proportion">1</property>
                                                 <object class="wxBoxSizer" expanded="1">
                                                     <property name="minimum_size"></property>
@@ -1020,7 +1020,7 @@
                                     </object>
                                     <object class="sizeritem" expanded="1">
                                         <property name="border">5</property>
-                                        <property name="flag">wxEXPAND</property>
+                                        <property name="flag">wxALL|wxEXPAND|wxALIGN_RIGHT</property>
                                         <property name="proportion">1</property>
                                         <object class="wxBoxSizer" expanded="1">
                                             <property name="minimum_size"></property>
@@ -1235,7 +1235,7 @@
                                             </object>
                                             <object class="sizeritem" expanded="1">
                                                 <property name="border">5</property>
-                                                <property name="flag">wxALL|wxEXPAND</property>
+                                                <property name="flag">wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</property>
                                                 <property name="proportion">8</property>
                                                 <object class="wxStaticBoxSizer" expanded="1">
                                                     <property name="id">wxID_ANY</property>
@@ -1247,9 +1247,9 @@
                                                     <event name="OnUpdateUI"></event>
                                                     <object class="sizeritem" expanded="1">
                                                         <property name="border">5</property>
-                                                        <property name="flag">wxALL|wxEXPAND</property>
+                                                        <property name="flag">wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL</property>
                                                         <property name="proportion">1</property>
-                                                        <object class="wxStaticBitmap" expanded="1">
+                                                        <object class="wxPanel" expanded="1">
                                                             <property name="BottomDockable">1</property>
                                                             <property name="LeftDockable">1</property>
                                                             <property name="RightDockable">1</property>
@@ -1260,7 +1260,6 @@
                                                             <property name="aui_row"></property>
                                                             <property name="best_size"></property>
                                                             <property name="bg"></property>
-                                                            <property name="bitmap">Load From File; ; [-1; -1]</property>
                                                             <property name="caption"></property>
                                                             <property name="caption_visible">1</property>
                                                             <property name="center_pane">0</property>
@@ -1285,7 +1284,7 @@
                                                             <property name="minimize_button">0</property>
                                                             <property name="minimum_size"></property>
                                                             <property name="moveable">1</property>
-                                                            <property name="name">m_bitmap1</property>
+                                                            <property name="name">statsPanel</property>
                                                             <property name="pane_border">1</property>
                                                             <property name="pane_position"></property>
                                                             <property name="pane_size"></property>
@@ -1300,7 +1299,7 @@
                                                             <property name="tooltip"></property>
                                                             <property name="window_extra_style"></property>
                                                             <property name="window_name"></property>
-                                                            <property name="window_style"></property>
+                                                            <property name="window_style">wxTAB_TRAVERSAL</property>
                                                             <event name="OnChar"></event>
                                                             <event name="OnEnterWindow"></event>
                                                             <event name="OnEraseBackground"></event>

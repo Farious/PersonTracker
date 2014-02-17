@@ -25,28 +25,49 @@ import ImageIO as IO
 class CalcFrame(wxTrackerForm.TrackerMainFrame):
     # Class constructor
     def __init__(self, parent):
-        #initialize parent class
+        #Initialize parent class
         wxTrackerForm.TrackerMainFrame.__init__(self, parent)
-        io = IO.ImageIO()
-        io.loadImage('./RESOURCES/tree.jpg')
-        self.canvas = pyGL.QuadCanvas(self.glPanel, io.image)
-        self.canvas.SetMinSize((300, 300))
 
+        # Configuring the three OpenGL windows: Video Stream; ROC Curve; Statistic Panel
+
+        # Video Stream
+        self.streamCanvas = pyGL.QuadCanvas(self.glPanel)
+        self.streamCanvas.SetMinSize((300, 300))
         self.glPanel.SetSize((300, 300))
         self.glPanel.Layout()
 
+        # Statistics Panel
+        self.statsCanvas = pyGL.QuadCanvas(self.statsPanel)
+        self.statsCanvas.SetMinSize((300, 300))
+        self.statsPanel.SetSize((300, 300))
+        self.statsPanel.Layout()
+
+        # ROC Panel
+        self.rocCanvas = pyGL.QuadCanvas(self.rocTab)
+        self.rocCanvas.SetMinSize((300, 300))
+        self.rocTab.SetSize((300, 300))
+        self.rocTab.Layout()
+
+        # All panels
+        self.glCanvasSet = {self.trackerTab: [(self.streamCanvas, self.glPanel),
+                                              (self.statsCanvas, self.statsPanel)],
+                            self.rocTab: [(self.rocCanvas, self.rocTab)]}
+
     # This function is called whenever the window is resized
     def reDraw(self, event):
-        size = self.glPanel.GetSize()
-        if size.width < size.height:
-            size.height = size.width
-        else:
-            size.width = size.height
-        self.canvas.SetSize(size)
-        self.glPanel.SetSize(size)
-        if (self.canvas.init):
-            self.canvas.DoSetViewport()
-            self.canvas.OnDraw()
+        for winName in self.glCanvasSet.keys():
+            if winName.IsShown():
+                for canvas, panel in self.glCanvasSet.get(winName):
+                    size = panel.GetSize()
+                    if size.width < size.height:
+                        size.height = size.width
+                    else:
+                        size.width = size.height
+                    canvas.SetSize(size)
+                    panel.SetSize(size)
+                    if canvas.init:
+                        canvas.DoSetViewport()
+                        canvas.OnDraw()
         self.Layout()
 
     # Define behaviour when we click the "rewind" button
@@ -76,6 +97,10 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
     # Define the behaviour for the "forward" button
     def forwardBtnClick(self, event):
         event.Skip()
+
+    def setMainImage(self, image):
+        print 1
+
 
 if __name__ == "__main__":
     # WX Mandatory App creation
