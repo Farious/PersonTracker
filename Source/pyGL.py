@@ -97,6 +97,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
 class QuadCanvas(MyCanvasBase):
     def InitGL(self):
         self.init = True
+        self.imageID = -1
         self.imageID = self.loadImage(self.image)
 
         # set viewing projection
@@ -111,11 +112,14 @@ class QuadCanvas(MyCanvasBase):
 
     def loadImage(self, image):
         ix, iy = image.shape[:2]
+
         ID = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, ID)
+        self.imageID = ID
+        self.image = image
+        glBindTexture(GL_TEXTURE_2D, self.imageID)
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, image)
-        return ID
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, self.image)
+        return self.imageID
 
     def setupTexture(self):
         """Render-time texture environment setup"""
@@ -124,6 +128,9 @@ class QuadCanvas(MyCanvasBase):
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
         glBindTexture(GL_TEXTURE_2D, self.imageID)
+
+    def updateTexture(self):
+        self.context = glcanvas.GLContext(self)
 
     def OnDraw(self):
         self.setupTexture()

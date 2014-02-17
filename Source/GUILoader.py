@@ -96,10 +96,14 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
     # Define the behaviour for the "forward" button
     def forwardBtnClick(self, event):
+        io = IO.ImageIO()
+        io.loadImage("./RESOURCES/tree.jpg")
+        self.setMainImage(io.returnImage())
         event.Skip()
 
     def setMainImage(self, image):
-        print 1
+        self.streamCanvas.updateTexture()
+        self.streamCanvas.loadImage(image)
 
 
 if __name__ == "__main__":
