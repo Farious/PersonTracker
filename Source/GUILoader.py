@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright {2014} {Instituto Superior Técnico - Lisboa}
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,39 +12,80 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
 __author__ = 'Fábio'
-import sys, pygtk, gtk, gtk.glade
-import gtk.gtkgl
-# from OpenGL.GL import *
-# from OpenGL.GLU import *
+import wx, numpy as np
 
-# our imports
+# Our imports
+import wxTrackerForm
+import pyGL
 import ImageIO as IO
 
-class PersonTrackerGUI:
-    def gtk_main_quit(self, widget, data=None):
-        print "destroy signal occurred"
-        gtk.main_quit()
 
-    def __init__(self):
-        self.gladeFile = 'HDA3.8.glade'
-        self.GUIFolder = './GUI/'
+# Defining the class that will inherit the TrackerMainFrame class created with wxFowmBuilder.
+class CalcFrame(wxTrackerForm.TrackerMainFrame):
+    # Class constructor
+    def __init__(self, parent):
+        #initialize parent class
+        wxTrackerForm.TrackerMainFrame.__init__(self, parent)
+        io = IO.ImageIO()
+        io.loadImage('./RESOURCES/tree.jpg')
+        self.canvas = pyGL.QuadCanvas(self.glPanel, io.image)
+        self.canvas.SetMinSize((300, 300))
 
-        # Initializes the GTK builder (<3.0)
-        self.gtkBuilder = gtk.Builder()
-        self.gtkBuilder.add_from_file(self.GUIFolder + self.gladeFile)
+        self.glPanel.SetSize((300, 300))
+        self.glPanel.Layout()
 
-        # Initializes and defines the signals\events in the window
-        self.gtkBuilder.connect_signals(self)
+    # This function is called whenever the window is resized
+    def reDraw(self, event):
+        size = self.glPanel.GetSize()
+        if size.width < size.height:
+            size.height = size.width
+        else:
+            size.width = size.height
+        self.canvas.SetSize(size)
+        self.glPanel.SetSize(size)
+        if (self.canvas.init):
+            self.canvas.DoSetViewport()
+            self.canvas.OnDraw()
+        self.Layout()
 
-        # Selects which window so show
-        self.gtkBuilder.get_object('TrackerMainWindow').show_all()
+    # Define behaviour when we click the "rewind" button
+    def rewindBtnClick(self, event):
+        event.Skip()
 
-        self.settings = gtk.settings_get_default()
-        self.settings.props.gtk_button_images = True
+    # Define the behaviour for the "previous frame" button
+    def prevFrameBtnClick(self, event):
+        event.Skip()
 
+    # Define the behaviour for the "stop" button
+    def stopBtnClick(self, event):
+        event.Skip()
+
+    # Define the behaviour for the "play" button
+    def playBtnClick(self, event):
+        event.Skip()
+
+    # Define the behaviour for the "pause" button
+    def pauseBtnClick(self, event):
+        event.Skip()
+
+    # Define the behaviour for the "next frame" button
+    def nextFrameBtnClick(self, event):
+        event.Skip()
+
+    # Define the behaviour for the "forward" button
+    def forwardBtnClick(self, event):
+        event.Skip()
 
 if __name__ == "__main__":
-    app = PersonTrackerGUI()
-    gtk.main()
+    # WX Mandatory App creation
+    app = wx.App(False)
+
+    # Create the wxTrackerForm window (The Main App window)
+    frame = CalcFrame(None)
+
+    # Show the wxTrackerForm frame
+    frame.Show(True)
+
+    # Start the WX Application
+    app.MainLoop()

@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright {2014} {Instituto Superior Técnico - Lisboa}
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@ __author__ = 'Fábio'
 
 import cv2, numpy as np
 
+
 class ImageIO:
     def __init__(self):
         self.image = 0
@@ -28,6 +29,9 @@ class ImageIO:
         if imArray != None:
             self.image = imArray
 
+    def returnImage(self):
+        return self.image
+
     def showImage(self):
         if self.image != None:
             cv2.namedWindow('test', cv2.WINDOW_NORMAL)
@@ -36,5 +40,5 @@ class ImageIO:
 
 if __name__ == "__main__":
     io = ImageIO()
-    io.loadImage('./RESOURCES/IST_0005.jpg')
+    io.loadImage('./RESOURCES/tree.jpg')
     io.showImage()
