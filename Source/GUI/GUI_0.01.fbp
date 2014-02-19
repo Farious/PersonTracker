@@ -1242,12 +1242,12 @@
                                                     <property name="label">Statistics</property>
                                                     <property name="minimum_size"></property>
                                                     <property name="name">statBox</property>
-                                                    <property name="orient">wxVERTICAL</property>
+                                                    <property name="orient">wxHORIZONTAL</property>
                                                     <property name="permission">none</property>
                                                     <event name="OnUpdateUI"></event>
                                                     <object class="sizeritem" expanded="1">
                                                         <property name="border">5</property>
-                                                        <property name="flag">wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL</property>
+                                                        <property name="flag">wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND</property>
                                                         <property name="proportion">1</property>
                                                         <object class="wxPanel" expanded="1">
                                                             <property name="BottomDockable">1</property>
@@ -1323,6 +1323,12 @@
                                                             <event name="OnSetFocus"></event>
                                                             <event name="OnSize"></event>
                                                             <event name="OnUpdateUI"></event>
+                                                            <object class="wxBoxSizer" expanded="1">
+                                                                <property name="minimum_size"></property>
+                                                                <property name="name">bSizer5</property>
+                                                                <property name="orient">wxVERTICAL</property>
+                                                                <property name="permission">none</property>
+                                                            </object>
                                                         </object>
                                                     </object>
                                                 </object>

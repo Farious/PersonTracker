@@ -14,6 +14,7 @@
 #    limitations under the License.
 __author__ = 'Fábio'
 import wx, numpy as np
+import wx.lib.mixins.inspection
 
 # Our imports
 import wxTrackerForm
@@ -32,20 +33,14 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
         # Video Stream
         self.streamCanvas = pyGL.QuadCanvas(self.glPanel)
-        self.streamCanvas.SetMinSize((300, 300))
-        self.glPanel.SetSize((300, 300))
         self.glPanel.Layout()
 
         # Statistics Panel
         self.statsCanvas = pyGL.QuadCanvas(self.statsPanel)
-        self.statsCanvas.SetMinSize((300, 300))
-        self.statsPanel.SetSize((300, 300))
         self.statsPanel.Layout()
 
         # ROC Panel
         self.rocCanvas = pyGL.QuadCanvas(self.rocTab)
-        self.rocCanvas.SetMinSize((300, 300))
-        self.rocTab.SetSize((300, 300))
         self.rocTab.Layout()
 
         # All panels
@@ -58,16 +53,15 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         for winName in self.glCanvasSet.keys():
             if winName.IsShown():
                 for canvas, panel in self.glCanvasSet.get(winName):
-                    size = panel.GetSize()
-                    if size.width < size.height:
-                        size.height = size.width
-                    else:
-                        size.width = size.height
+                    size = panel.Size
+                    # if size.width < size.height:
+                    #     size.height = size.width
+                    # else:
+                    #     size.width = size.height
                     canvas.SetSize(size)
                     panel.SetSize(size)
                     if canvas.init:
-                        canvas.DoSetViewport()
-                        canvas.OnDraw()
+                        canvas.RepositionQuad()
         self.Layout()
 
     # Define behaviour when we click the "rewind" button
@@ -92,29 +86,41 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
     # Define the behaviour for the "next frame" button
     def nextFrameBtnClick(self, event):
+        io = IO.ImageIO()
+        # io.loadImage("./RESOURCES/JPEG/camera60/I00009.jpeg")
+        io.loadImage("./RESOURCES/tree.jpg")
+        self.statsCanvas.loadImage(io.returnImage())
         event.Skip()
 
     # Define the behaviour for the "forward" button
     def forwardBtnClick(self, event):
         io = IO.ImageIO()
-        io.loadImage("./RESOURCES/tree.jpg")
+        io.loadImage("./RESOURCES/JPEG/camera60/I00009.jpeg")
+        #io.loadImage("./RESOURCES/tree.jpg")
         self.setMainImage(io.returnImage())
         event.Skip()
 
     def setMainImage(self, image):
-        self.streamCanvas.updateTexture()
         self.streamCanvas.loadImage(image)
 
 
+class MyApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
+    def OnInit(self):
+        self.Init()  # initialize the inspection tool
+        frame = CalcFrame(None)
+        frame.Show(True)
+        self.SetTopWindow(frame)
+        return True
+
 if __name__ == "__main__":
     # WX Mandatory App creation
-    app = wx.App(False)
-
+    # app = wx.App(False)
+    app = MyApp()
     # Create the wxTrackerForm window (The Main App window)
-    frame = CalcFrame(None)
+    # frame = CalcFrame(None)
 
     # Show the wxTrackerForm frame
-    frame.Show(True)
+    # frame.Show(True)
 
     # Start the WX Application
     app.MainLoop()

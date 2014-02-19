@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 # Copyright {2014} {Instituto Superior Técnico - Lisboa}
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,8 +35,9 @@ except ImportError:
 # Class defining the base OpenGL Canvas
 class MyCanvasBase(glcanvas.GLCanvas):
     def __init__(self, parent):
+        w, h = parent.Size
         # Empty image
-        self.image = np.zeros((200, 200, 3), np.uint8)
+        self.image = np.ones((w, h, 3), np.uint8) * 255
 
         # GLCanvas constructor
         glcanvas.GLCanvas.__init__(self, parent, -1)
@@ -69,9 +71,73 @@ class MyCanvasBase(glcanvas.GLCanvas):
         event.Skip()
 
     def DoSetViewport(self):
-        size = self.size = self.GetClientSize()
+        size = self.GetClientSize()
         self.SetCurrent(self.context)
         glViewport(0, 0, size.width, size.height)
+
+    def RepositionQuad(self):
+        """We want to calculate the maximum size the image can have without
+        distortions and taking up the maximum space available
+        """
+        self.DoSetViewport()
+        if self.image.shape:
+            # Image size
+            imH, imW = self.image.shape[:2]
+
+            # Size, in pixels, of the container canvas, glOrtho
+            # is defined to be 0 to 1 in W and H. So 1 in each size
+            # is equivalent to the container size in pixels
+            clW, clH = self.GetClientSize()
+            rW, rH = 1, 1
+
+            # If the image is non-empty
+            if imW > 0 and imH > 0:
+                # Identify the minimum size
+                rC = clW/clH
+                rI = imW/imH
+
+                val = 0
+                if imH > imW:
+                    if clH > clW:
+                        val = 1
+                    else:
+                        val = 2
+                else:
+                    if clH > clW:
+                        val = 3
+                    else:
+                        val = 4
+
+                if val == 1 or val == 3:
+                    rW = 1
+                    rH = (1/rI) * rC
+                else:
+                    rW = rI * (1/rC)
+                    rH = 1
+
+                if rW * clW > clW:
+                    rW = 1
+                    rH = (1/rI) * rC
+                if rH * clH > clH:
+                    rH = 1
+                    rW = rI * (1/rC)
+
+            # Apply Transformation in Model View Space
+            glLoadIdentity()
+            glScalef(rW, rH, 0)
+
+            # Move to Camera space to reset it and center the object
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
+            glOrtho(0, 1, 0, 1, -1, 1)
+            glTranslatef((1-rW)/2, (1-rH)/2, 0)
+
+            # Return to Model View Space
+            glMatrixMode(GL_MODELVIEW)
+
+            # Set Viewport and Draw
+            self.DoSetViewport()
+            self.OnDraw()
 
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
@@ -102,7 +168,8 @@ class QuadCanvas(MyCanvasBase):
 
         # set viewing projection
         glMatrixMode(GL_PROJECTION)
-        glOrtho(0, 1, 0, 1, -2, 2)
+        glLoadIdentity();
+        glOrtho(0, 1, 0, 1, -1, 1)
 
         # position viewer
         glMatrixMode(GL_MODELVIEW)
@@ -111,7 +178,8 @@ class QuadCanvas(MyCanvasBase):
         glEnable(GL_LIGHT0)
 
     def loadImage(self, image):
-        ix, iy = image.shape[:2]
+        self.DoSetViewport()
+        iy, ix = image.shape[:2]
 
         ID = glGenTextures(1)
         self.imageID = ID
@@ -130,13 +198,14 @@ class QuadCanvas(MyCanvasBase):
         glBindTexture(GL_TEXTURE_2D, self.imageID)
 
     def updateTexture(self):
-        self.context = glcanvas.GLContext(self)
+        self.DoSetViewport()
 
     def OnDraw(self):
         self.setupTexture()
         # clear color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
+        glClearColor(1.0, 1.0, 1.0, 1.0)
+        
         glBegin(GL_QUADS)
         glNormal3f(0.0, 0.0, 1.0)
 
@@ -153,5 +222,4 @@ class QuadCanvas(MyCanvasBase):
         glVertex3f(0, 1, 0)
 
         glEnd()
-
         self.SwapBuffers()

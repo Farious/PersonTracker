@@ -86,10 +86,16 @@ class TrackerMainFrame ( wx.Frame ):
 		
 		expansionBox.Add( videoSelBox, 2, wx.ALL|wx.EXPAND, 5 )
 		
-		statBox = wx.StaticBoxSizer( wx.StaticBox( self.trackerTab, wx.ID_ANY, u"Statistics" ), wx.VERTICAL )
+		statBox = wx.StaticBoxSizer( wx.StaticBox( self.trackerTab, wx.ID_ANY, u"Statistics" ), wx.HORIZONTAL )
 		
 		self.statsPanel = wx.Panel( self.trackerTab, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		statBox.Add( self.statsPanel, 1, wx.EXPAND|wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		bSizer5 = wx.BoxSizer( wx.VERTICAL )
+		
+		
+		self.statsPanel.SetSizer( bSizer5 )
+		self.statsPanel.Layout()
+		bSizer5.Fit( self.statsPanel )
+		statBox.Add( self.statsPanel, 1, wx.EXPAND|wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		
 		expansionBox.Add( statBox, 8, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
