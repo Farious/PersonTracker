@@ -1422,13 +1422,40 @@
                 </object>
             </object>
             <object class="wxTimer" expanded="1">
-                <property name="enabled">0</property>
-                <property name="id">wxID_ANY</property>
+                <property name="enabled">1</property>
+                <property name="id">MainTimer</property>
                 <property name="name">glTimer</property>
+                <property name="oneshot">0</property>
+                <property name="period">50</property>
+                <property name="permission">protected</property>
+                <event name="OnTimer">updateStreamImage</event>
+            </object>
+            <object class="wxTimer" expanded="1">
+                <property name="enabled">1</property>
+                <property name="id">statsTimer</property>
+                <property name="name">updateStatTimer</property>
                 <property name="oneshot">0</property>
                 <property name="period">300</property>
                 <property name="permission">protected</property>
-                <event name="OnTimer"></event>
+                <event name="OnTimer">updateStatPanel</event>
+            </object>
+            <object class="wxTimer" expanded="1">
+                <property name="enabled">1</property>
+                <property name="id">checkListTimer</property>
+                <property name="name">updateCheckLTimer</property>
+                <property name="oneshot">0</property>
+                <property name="period">300</property>
+                <property name="permission">protected</property>
+                <event name="OnTimer">updateCheckList</event>
+            </object>
+            <object class="wxTimer" expanded="1">
+                <property name="enabled">1</property>
+                <property name="id">rocTimer</property>
+                <property name="name">updateROCTimer</property>
+                <property name="oneshot">0</property>
+                <property name="period">300</property>
+                <property name="permission">protected</property>
+                <event name="OnTimer">updateROC</event>
             </object>
             <object class="wxMenuBar" expanded="1">
                 <property name="bg"></property>

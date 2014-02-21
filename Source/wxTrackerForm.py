@@ -10,6 +10,11 @@
 import wx
 import wx.xrc
 
+MainTimer = 1000
+statsTimer = 1001
+checkListTimer = 1002
+rocTimer = 1003
+
 ###########################################################################
 ## Class TrackerMainFrame
 ###########################################################################
@@ -95,7 +100,7 @@ class TrackerMainFrame ( wx.Frame ):
 		self.statsPanel.SetSizer( bSizer5 )
 		self.statsPanel.Layout()
 		bSizer5.Fit( self.statsPanel )
-		statBox.Add( self.statsPanel, 1, wx.EXPAND|wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		statBox.Add( self.statsPanel, 1, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
 		
 		
 		expansionBox.Add( statBox, 8, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
@@ -117,7 +122,21 @@ class TrackerMainFrame ( wx.Frame ):
 		self.SetSizer( bSizer1 )
 		self.Layout()
 		self.glTimer = wx.Timer()
-		self.glTimer.SetOwner( self, wx.ID_ANY )
+		self.glTimer.SetOwner( self, MainTimer )
+		self.glTimer.Start( 50 )
+		
+		self.updateStatTimer = wx.Timer()
+		self.updateStatTimer.SetOwner( self, statsTimer )
+		self.updateStatTimer.Start( 300 )
+		
+		self.updateCheckLTimer = wx.Timer()
+		self.updateCheckLTimer.SetOwner( self, checkListTimer )
+		self.updateCheckLTimer.Start( 300 )
+		
+		self.updateROCTimer = wx.Timer()
+		self.updateROCTimer.SetOwner( self, rocTimer )
+		self.updateROCTimer.Start( 300 )
+		
 		self.m_menubar1 = wx.MenuBar( 0 )
 		self.fileMenu = wx.Menu()
 		self.fileMenu.AppendSeparator()
@@ -147,6 +166,10 @@ class TrackerMainFrame ( wx.Frame ):
 		self.pauseBtn.Bind( wx.EVT_BUTTON, self.pauseBtnClick )
 		self.nextFrameBtn.Bind( wx.EVT_BUTTON, self.nextFrameBtnClick )
 		self.forwardBtn.Bind( wx.EVT_BUTTON, self.forwardBtnClick )
+		self.Bind( wx.EVT_TIMER, self.updateStreamImage, id=MainTimer )
+		self.Bind( wx.EVT_TIMER, self.updateStatPanel, id=statsTimer )
+		self.Bind( wx.EVT_TIMER, self.updateCheckList, id=checkListTimer )
+		self.Bind( wx.EVT_TIMER, self.updateROC, id=rocTimer )
 	
 	def __del__( self ):
 		pass
@@ -177,6 +200,18 @@ class TrackerMainFrame ( wx.Frame ):
 		event.Skip()
 	
 	def forwardBtnClick( self, event ):
+		event.Skip()
+	
+	def updateStreamImage( self, event ):
+		event.Skip()
+	
+	def updateStatPanel( self, event ):
+		event.Skip()
+	
+	def updateCheckList( self, event ):
+		event.Skip()
+	
+	def updateROC( self, event ):
 		event.Skip()
 	
 

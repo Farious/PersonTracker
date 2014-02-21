@@ -25,6 +25,8 @@ except ImportError:
 
 try:
     from OpenGL.GL import *
+    from OpenGL.GL import shaders
+    from OpenGL.arrays import vbo
     from OpenGL.GLU import *
     from OpenGL.GLUT import *
 
@@ -36,8 +38,9 @@ except ImportError:
 class MyCanvasBase(glcanvas.GLCanvas):
     def __init__(self, parent):
         w, h = parent.Size
+
         # Empty image
-        self.image = np.ones((w, h, 3), np.uint8) * 255
+        self.image = np.ones((w, h, 3), np.uint8) * 0
 
         # GLCanvas constructor
         glcanvas.GLCanvas.__init__(self, parent, -1)
@@ -47,6 +50,11 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
         # OpenGL Context
         self.context = glcanvas.GLContext(self)
+        self.program = -1
+        self.vbo = -1
+
+        self.rH = 1
+        self.rW = 1
 
         # Mouse position logic
         self.lastx = self.x = 30
@@ -62,24 +70,25 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseDown)
         self.Bind(wx.EVT_LEFT_UP, self.OnMouseUp)
         self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
+        return
 
     def OnEraseBackground(self, event):
         pass  # Do nothing, to avoid flashing on MSW.
 
     def OnSize(self, event):
         wx.CallAfter(self.DoSetViewport)
-        event.Skip()
+        return
 
     def DoSetViewport(self):
         size = self.GetClientSize()
         self.SetCurrent(self.context)
+        self.RepositionQuad()
         glViewport(0, 0, size.width, size.height)
 
     def RepositionQuad(self):
         """We want to calculate the maximum size the image can have without
         distortions and taking up the maximum space available
         """
-        self.DoSetViewport()
         if self.image.shape:
             # Image size
             imH, imW = self.image.shape[:2]
@@ -91,10 +100,10 @@ class MyCanvasBase(glcanvas.GLCanvas):
             rW, rH = 1, 1
 
             # If the image is non-empty
-            if imW > 0 and imH > 0:
+            if imW > 0 and imH > 0 and clW > 0 and clH > 0:
                 # Identify the minimum size
-                rC = clW/clH
-                rI = imW/imH
+                rC = clW / clH
+                rI = imW / imH
 
                 val = 0
                 if imH > imW:
@@ -110,34 +119,20 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
                 if val == 1 or val == 3:
                     rW = 1
-                    rH = (1/rI) * rC
+                    rH = (1 / rI) * rC
                 else:
-                    rW = rI * (1/rC)
+                    rW = rI * (1 / rC)
                     rH = 1
 
                 if rW * clW > clW:
                     rW = 1
-                    rH = (1/rI) * rC
+                    rH = (1 / rI) * rC
                 if rH * clH > clH:
                     rH = 1
-                    rW = rI * (1/rC)
+                    rW = rI * (1 / rC)
 
-            # Apply Transformation in Model View Space
-            glLoadIdentity()
-            glScalef(rW, rH, 0)
-
-            # Move to Camera space to reset it and center the object
-            glMatrixMode(GL_PROJECTION)
-            glLoadIdentity()
-            glOrtho(0, 1, 0, 1, -1, 1)
-            glTranslatef((1-rW)/2, (1-rH)/2, 0)
-
-            # Return to Model View Space
-            glMatrixMode(GL_MODELVIEW)
-
-            # Set Viewport and Draw
-            self.DoSetViewport()
-            self.OnDraw()
+            self.rH = rH
+            self.rW = rW
 
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
@@ -161,65 +156,138 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
 
 class QuadCanvas(MyCanvasBase):
+    def load_shaders(self):
+        self.SetCurrent(self.context)
+        self.val = 0
+        # Show OpenGL Information
+        print "Vendor:   " + glGetString(GL_VENDOR)
+        print "Renderer: " + glGetString(GL_RENDERER)
+        print "OpenGL Version:  " + glGetString(GL_VERSION)
+        print "Shader Version:  " + glGetString(GL_SHADING_LANGUAGE_VERSION)
+
+        VERTEX_SHADER = shaders.compileShader("""#version 330 core
+        layout(location = 0) in vec4 position;
+        uniform vec2 scale;
+        out vec2 uv;
+        void main() {
+        gl_Position = vec4(position.xy * scale, position.zw);
+        uv = position.xy/2 + 0.5f;//(gl_Position.xy + 1.0f) / 2.0f;//vec2((gl_Position.x + 1.0f)/2.0f, (gl_Position.y + 1.0f)/2.0f );
+        uv.y = 1 - uv.y;
+        }""", GL_VERTEX_SHADER)
+
+        FRAGMENT_SHADER = shaders.compileShader("""#version 330 core
+        uniform sampler2D myTexture;
+        in vec2 uv;
+        out vec4 outputColor;
+        void main() {
+        outputColor = texture2D(myTexture, uv);
+        }""", GL_FRAGMENT_SHADER)
+
+        self.program = shaders.compileProgram(VERTEX_SHADER, FRAGMENT_SHADER)
+        self.scale = glGetUniformLocation(self.program, "scale")
+        self.texture = glGetUniformLocation(self.program, "myTexture")
+        return
+
+
+    def initialize_vertex_buffer(self):
+        self.vbo = vbo.VBO(self.quad)
+        return
+
+
     def InitGL(self):
         self.init = True
+
+        self.quadObjectID = -1
+        self.quad = np.array([
+                [-1, -1, 0],
+                [1, -1, 0],
+                [1, 1, 0],
+                [-1, 1, 0]
+        ], 'f')
+
+        self.initTexture = False
+
+        self.load_shaders()
+        self.initialize_vertex_buffer()
+
+        # Setup the texture ID
         self.imageID = -1
-        self.imageID = self.loadImage(self.image)
+        self.loadImage(self.image)
 
-        # set viewing projection
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity();
-        glOrtho(0, 1, 0, 1, -1, 1)
-
-        # position viewer
-        glMatrixMode(GL_MODELVIEW)
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
 
     def loadImage(self, image):
-        self.DoSetViewport()
+        self.SetCurrent(self.context)
         iy, ix = image.shape[:2]
 
-        ID = glGenTextures(1)
-        self.imageID = ID
         self.image = image
-        glBindTexture(GL_TEXTURE_2D, self.imageID)
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, self.image)
-        return self.imageID
+
+        if self.imageID == -1:
+            self.imageID = glGenTextures(1)
+
+        glActiveTexture(GL_TEXTURE0 + 1)
+        if not self.initTexture:
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+            glBindTexture(GL_TEXTURE_2D, self.imageID)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, self.image)
+            self.setupTexture()
+        else:
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+            glBindTexture(GL_TEXTURE_2D, self.imageID)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, self.image)
+            self.setupTexture()
+
+        glUseProgram(self.program)
+        glUniform1i(self.texture, self.imageID)
+        glUseProgram(0)
+
+        return
+
 
     def setupTexture(self):
         """Render-time texture environment setup"""
-        glEnable(GL_TEXTURE_2D)
+        self.SetCurrent(self.context)
+        glActiveTexture(GL_TEXTURE0 + 1)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
         glBindTexture(GL_TEXTURE_2D, self.imageID)
+        self.initTexture = True
+        return
 
     def updateTexture(self):
         self.DoSetViewport()
+        return
 
     def OnDraw(self):
-        self.setupTexture()
-        # clear color and depth buffers
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glClearColor(1.0, 1.0, 1.0, 1.0)
-        
-        glBegin(GL_QUADS)
-        glNormal3f(0.0, 0.0, 1.0)
+        self.SetCurrent(self.context)
 
-        glTexCoord2f(0, 1)
-        glVertex3f(0, 0, 0)
+        # Clear Color Buffer
+        glClearColor(1.0, 1.0, 0.0, 1.0)
+        glClear(GL_COLOR_BUFFER_BIT)
+        glLoadIdentity()
 
-        glTexCoord2f(1, 1)
-        glVertex3f(1, 0, 0)
+        # Draw using the shaders
+        glUseProgram(self.program)
 
-        glTexCoord2f(1, 0)
-        glVertex3f(1, 1, 0)
+        glUniform2f(self.scale, self.rW, self.rH)
 
-        glTexCoord2f(0, 0)
-        glVertex3f(0, 1, 0)
+        if self.initTexture:
+            glBindTexture(GL_TEXTURE_2D, self.imageID)
+            glUniform1i(self.texture, self.imageID)
 
-        glEnd()
+
+        # Bind the Quad
+        self.vbo.bind()
+
+        # Draw the Quad
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glVertexPointerf(self.vbo)
+        glDrawArrays(GL_QUADS, 0, 4)
+
+        # Unbind the Quad and stop using the shader
+        self.vbo.unbind()
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glUseProgram(0)
+
+        # Swap buffer
         self.SwapBuffers()

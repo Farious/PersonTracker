@@ -14,7 +14,7 @@
 #    limitations under the License.
 __author__ = 'Fábio'
 import wx, numpy as np
-import wx.lib.mixins.inspection
+import wx.lib.mixins.inspection # Ctrl+Alt+i to open an inspection window to retrieve information on WX widgets
 
 # Our imports
 import wxTrackerForm
@@ -26,6 +26,7 @@ import ImageIO as IO
 class CalcFrame(wxTrackerForm.TrackerMainFrame):
     # Class constructor
     def __init__(self, parent):
+        self.i = 0
         #Initialize parent class
         wxTrackerForm.TrackerMainFrame.__init__(self, parent)
 
@@ -54,14 +55,16 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
             if winName.IsShown():
                 for canvas, panel in self.glCanvasSet.get(winName):
                     size = panel.Size
-                    # if size.width < size.height:
-                    #     size.height = size.width
-                    # else:
-                    #     size.width = size.height
                     canvas.SetSize(size)
                     panel.SetSize(size)
                     if canvas.init:
-                        canvas.RepositionQuad()
+                        canvas.OnSize(event)
+                        canvas.OnDraw()
+                    else:
+                        canvas.InitGL()
+                        canvas.OnSize(event)
+                        canvas.OnDraw()
+        event.Skip()
         self.Layout()
 
     # Define behaviour when we click the "rewind" button
@@ -94,14 +97,26 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
     # Define the behaviour for the "forward" button
     def forwardBtnClick(self, event):
-        io = IO.ImageIO()
-        io.loadImage("./RESOURCES/JPEG/camera60/I00009.jpeg")
+        io1 = IO.ImageIO()
+        io1.loadImage("./RESOURCES/JPEG/camera60/I00009.jpeg")
         #io.loadImage("./RESOURCES/tree.jpg")
-        self.setMainImage(io.returnImage())
+        self.setMainImage(io1.returnImage())
         event.Skip()
 
     def setMainImage(self, image):
         self.streamCanvas.loadImage(image)
+
+    def updateStreamImage(self, event):
+        return
+
+    def updateCheckList( self, event ):
+        return
+
+    def updateROC( self, event ):
+        return
+
+    def updateStatPanel( self, event ):
+        return
 
 
 class MyApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
