@@ -171,7 +171,7 @@ class QuadCanvas(MyCanvasBase):
         out vec2 uv;
         void main() {
         gl_Position = vec4(position.xy * scale, position.zw);
-        uv = position.xy/2 + 0.5f;//(gl_Position.xy + 1.0f) / 2.0f;//vec2((gl_Position.x + 1.0f)/2.0f, (gl_Position.y + 1.0f)/2.0f );
+        uv = position.xy/2 + 0.5f;
         uv.y = 1 - uv.y;
         }""", GL_VERTEX_SHADER)
 
@@ -180,7 +180,7 @@ class QuadCanvas(MyCanvasBase):
         in vec2 uv;
         out vec4 outputColor;
         void main() {
-        outputColor = texture2D(myTexture, uv);
+        outputColor = texture2D(myTexture, uv );
         }""", GL_FRAGMENT_SHADER)
 
         self.program = shaders.compileProgram(VERTEX_SHADER, FRAGMENT_SHADER)
@@ -262,7 +262,7 @@ class QuadCanvas(MyCanvasBase):
         self.SetCurrent(self.context)
 
         # Clear Color Buffer
-        glClearColor(1.0, 1.0, 0.0, 1.0)
+        glClearColor(240.0/255, 240.0/255, 240.0/255, 1.0)
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
 

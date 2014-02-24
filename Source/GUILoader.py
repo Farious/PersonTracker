@@ -13,19 +13,40 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 __author__ = 'Fábio'
-import wx, numpy as np
-import wx.lib.mixins.inspection # Ctrl+Alt+i to open an inspection window to retrieve information on WX widgets
+import wx
+import wx.lib.mixins.inspection  # Ctrl+Alt+i to open an inspection window to retrieve information on WX widgets
 
 # Our imports
 import wxTrackerForm
 import pyGL
-import ImageIO as IO
+import fileIO as FIO
+
+# Class used to start the wx window. The wx.lib.mixins.inspection.InspectionMixin is a class that, when inherited,
+# enables a debug mode. To enter this mode press: Ctrl - Alt - I. In the window that pops up we can debug every UI
+# aspect.
+class MyApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
+    def __init__(self, debug=False):
+        super(MyApp, self).__init__()
+        if debug:
+            self.Init()  # initialize the inspection tool
+
+    def OnInit(self):
+        # Create the wxTrackerForm window (The Main App window)
+        frame = CalcFrame(None)
+
+        # Show the wxTrackerForm frame
+        frame.Show(True)
+        self.SetTopWindow(frame)
+        return True
 
 
 # Defining the class that will inherit the TrackerMainFrame class created with wxFowmBuilder.
+# It's in here that it is needed to populate the functions of each button\timers\etc.
 class CalcFrame(wxTrackerForm.TrackerMainFrame):
     # Class constructor
     def __init__(self, parent):
+        self.fio = FIO.FileIO()
+        self.refresh = False
         self.i = 0
         #Initialize parent class
         wxTrackerForm.TrackerMainFrame.__init__(self, parent)
@@ -67,6 +88,9 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         event.Skip()
         self.Layout()
 
+    """
+    wxPython Buttons - Main Tracker Tab - We need to implement the "video" management buttons.
+    """
     # Define behaviour when we click the "rewind" button
     def rewindBtnClick(self, event):
         event.Skip()
@@ -89,53 +113,60 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
     # Define the behaviour for the "next frame" button
     def nextFrameBtnClick(self, event):
-        io = IO.ImageIO()
-        # io.loadImage("./RESOURCES/JPEG/camera60/I00009.jpeg")
-        io.loadImage("./RESOURCES/tree.jpg")
-        self.statsCanvas.loadImage(io.returnImage())
         event.Skip()
 
     # Define the behaviour for the "forward" button
     def forwardBtnClick(self, event):
-        io1 = IO.ImageIO()
-        io1.loadImage("./RESOURCES/JPEG/camera60/I00009.jpeg")
-        #io.loadImage("./RESOURCES/tree.jpg")
-        self.setMainImage(io1.returnImage())
         event.Skip()
 
-    def setMainImage(self, image):
-        self.streamCanvas.loadImage(image)
+    """
+    wxPython Timers - We need to implement our updating functions in here
+    """
 
     def updateStreamImage(self, event):
+        event.Skip()
         return
 
-    def updateCheckList( self, event ):
+    def updateROC(self, event):
+        event.Skip()
         return
 
-    def updateROC( self, event ):
+    def updateStatPanel(self, event):
+        event.Skip()
         return
 
-    def updateStatPanel( self, event ):
+    def updateGLCanvas(self, event):
+        self.reDraw(event)
+        event.Skip()
         return
 
+    """
+    Behaviour events - Keyboard, toolbar clicks, etc
+    """
 
-class MyApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
-    def OnInit(self):
-        self.Init()  # initialize the inspection tool
-        frame = CalcFrame(None)
-        frame.Show(True)
-        self.SetTopWindow(frame)
-        return True
+    def chkListKeyDown(self, event):
+        if wx.GetKeyState(wx.WXK_F5):
+            self.refresh = True
+        event.Skip()
+        return
+
+    def chkListKeyUp(self, event):
+        if self.refresh:
+            self.refresh = False
+            # DO STUFF HERE
+            print "Refresh"
+        return
+
+    def exit_form(self, event):
+        self.Destroy()
+        event.Skip()
+        return
+
 
 if __name__ == "__main__":
+    debug = False
     # WX Mandatory App creation
-    # app = wx.App(False)
-    app = MyApp()
-    # Create the wxTrackerForm window (The Main App window)
-    # frame = CalcFrame(None)
-
-    # Show the wxTrackerForm frame
-    # frame.Show(True)
+    app = MyApp(debug)
 
     # Start the WX Application
     app.MainLoop()
