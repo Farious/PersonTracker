@@ -69,6 +69,7 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         self.glCanvasSet = {self.trackerTab: [(self.streamCanvas, self.glPanel),
                                               (self.statsCanvas, self.statsPanel)],
                             self.rocTab: [(self.rocCanvas, self.rocTab)]}
+        return
 
     # This function is called whenever the window is resized
     def reDraw(self, event):
@@ -83,6 +84,7 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
                         canvas.OnDraw()
                     else:
                         canvas.InitGL()
+                        canvas.loadImage(self.streamCanvas.image)
                         canvas.OnSize(event)
                         canvas.OnDraw()
         event.Skip()

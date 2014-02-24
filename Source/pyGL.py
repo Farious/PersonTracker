@@ -40,7 +40,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         w, h = parent.Size
 
         # Empty image
-        self.image = np.ones((w, h, 3), np.uint8) * 0
+        self.image = np.ones((1, 1, 3), np.uint8) * 240
 
         # GLCanvas constructor
         glcanvas.GLCanvas.__init__(self, parent, -1)
@@ -254,9 +254,11 @@ class QuadCanvas(MyCanvasBase):
         self.initTexture = True
         return
 
+
     def updateTexture(self):
         self.DoSetViewport()
         return
+
 
     def OnDraw(self):
         self.SetCurrent(self.context)
