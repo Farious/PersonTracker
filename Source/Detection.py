@@ -19,6 +19,7 @@ class Detection:
     """
     Class to hold a detection configuration
     """
+
     def __init__(self, left, top, width, height, confidence, real, ids):
         self.left = left
         self.top = top

@@ -15,7 +15,7 @@
 
 __author__ = 'Fábio'
 
-import cv2, numpy as np
+import cv2
 
 
 class ImageIO:
@@ -37,6 +37,7 @@ class ImageIO:
             cv2.namedWindow('test', cv2.WINDOW_NORMAL)
             cv2.imshow('test', self.image)
             cv2.waitKey(0)
+
 
 if __name__ == "__main__":
     io = ImageIO()

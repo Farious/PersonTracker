@@ -34,6 +34,7 @@ try:
 except ImportError:
     haveOpenGL = False
 
+
 # Class defining the base OpenGL Canvas
 class MyCanvasBase(glcanvas.GLCanvas):
     def __init__(self, parent):
@@ -188,22 +189,20 @@ class QuadCanvas(MyCanvasBase):
         self.texture = glGetUniformLocation(self.program, "myTexture")
         return
 
-
     def initialize_vertex_buffer(self):
         self.vbo = vbo.VBO(self.quad)
         return
-
 
     def InitGL(self):
         self.init = True
 
         self.quadObjectID = -1
         self.quad = np.array([
-                [-1, -1, 0],
-                [1, -1, 0],
-                [1, 1, 0],
-                [-1, 1, 0]
-        ], 'f')
+                                 [-1, -1, 0],
+                                 [1, -1, 0],
+                                 [1, 1, 0],
+                                 [-1, 1, 0]
+                             ], 'f')
 
         self.initTexture = False
 
@@ -213,7 +212,6 @@ class QuadCanvas(MyCanvasBase):
         # Setup the texture ID
         self.imageID = -1
         self.loadImage(self.image)
-
 
     def loadImage(self, image):
         self.SetCurrent(self.context)
@@ -242,7 +240,6 @@ class QuadCanvas(MyCanvasBase):
 
         return
 
-
     def setupTexture(self):
         """Render-time texture environment setup"""
         self.SetCurrent(self.context)
@@ -254,17 +251,15 @@ class QuadCanvas(MyCanvasBase):
         self.initTexture = True
         return
 
-
     def updateTexture(self):
         self.DoSetViewport()
         return
-
 
     def OnDraw(self):
         self.SetCurrent(self.context)
 
         # Clear Color Buffer
-        glClearColor(240.0/255, 240.0/255, 240.0/255, 1.0)
+        glClearColor(240.0 / 255, 240.0 / 255, 240.0 / 255, 1.0)
         glClear(GL_COLOR_BUFFER_BIT)
         glLoadIdentity()
 
