@@ -13,9 +13,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 __author__ = 'Fábio'
+#/-----------------------------------------------------------------------------
+# System imports
 import wx
 import wx.lib.mixins.inspection  # Ctrl+Alt+i to open an inspection window to retrieve information on WX widgets
 
+#/-----------------------------------------------------------------------------
 # Our imports
 import wxTrackerForm
 import pyGL
@@ -148,21 +151,22 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         event.Skip()
         return
 
-    def personSelectionUpdate( self, event ):
+    def personSelectionUpdate(self, event):
         self.fio.person_input_from_chklist(self.personCheckList.GetChecked())
         return
 
-    def videoSelectionUpdate( self, event ):
+    def videoSelectionUpdate(self, event):
         self.fio.video_input_from_chklist(self.videoChkList.GetChecked())
         return
 
-    def updateCheckList( self, event ):
+    def updateCheckList(self, event):
         return
 
     """
     Behaviour events - Keyboard, toolbar clicks, etc
     """
-    def show_det_only( self, event ):
+
+    def show_det_only(self, event):
         self.fio.show_all = not self.fio.show_all
         return
 
