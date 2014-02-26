@@ -32,7 +32,7 @@ def loadImagePrintText(cam, frame, debugREID=1, showPD=1, debugPD=0, PDthreshold
     if showPD == 0:  # Don't print anything in image, just return the RAW
         return image
 
-    detectionsPath = "RESOURCES\Detections\set" + str(cam) + "\V000\\"
+    detectionsPath = ".\RESOURCES\Detections\camera" + str(cam) + "\\"
     detectionFile = "I" + str(frame).zfill(5) + ".txt"
 
     fileText = open(detectionsPath + detectionFile, 'r')

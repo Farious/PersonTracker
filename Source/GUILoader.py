@@ -58,17 +58,23 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         self.glPanel.Layout()
 
         # Statistics Panel
-        self.statsCanvas = pyGL.QuadCanvas(self.statsPanel)
-        self.statsPanel.Layout()
+        self.statsCanvas = pyGL.QuadCanvas(self.statTab)
+        self.statTab.Layout()
 
         # ROC Panel
         self.rocCanvas = pyGL.QuadCanvas(self.rocTab)
         self.rocTab.Layout()
 
         # All panels
-        self.glCanvasSet = {self.trackerTab: [(self.streamCanvas, self.glPanel),
-                                              (self.statsCanvas, self.statsPanel)],
-                            self.rocTab: [(self.rocCanvas, self.rocTab)]}
+        self.glCanvasSet = {self.trackerTab: [(self.streamCanvas, self.glPanel)],
+                            self.rocTab: [(self.rocCanvas, self.rocTab)],
+                            self.statTab: [(self.statsCanvas, self.statTab)]}
+
+        # Update Checklists
+        self.fio.update_lists()
+        self.personCheckList.Set(self.fio.retrieve_det_persons())
+        self.videoChkList.Set(self.fio.retrieve_videos_list())
+
         return
 
     # This function is called whenever the window is resized
@@ -142,9 +148,23 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         event.Skip()
         return
 
+    def personSelectionUpdate( self, event ):
+        self.fio.person_input_from_chklist(self.personCheckList.GetChecked())
+        return
+
+    def videoSelectionUpdate( self, event ):
+        self.fio.video_input_from_chklist(self.videoChkList.GetChecked())
+        return
+
+    def updateCheckList( self, event ):
+        return
+
     """
     Behaviour events - Keyboard, toolbar clicks, etc
     """
+    def show_det_only( self, event ):
+        self.fio.show_all = not self.fio.show_all
+        return
 
     def chkListKeyDown(self, event):
         if wx.GetKeyState(wx.WXK_F5):
@@ -156,7 +176,9 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         if self.refresh:
             self.refresh = False
             # DO STUFF HERE
-            print "Refresh"
+            self.fio.update_lists()
+            self.personCheckList.Set(self.fio.retrieve_det_persons())
+            self.videoChkList.Set(self.fio.retrieve_videos_list())
         return
 
     def exit_form(self, event):
