@@ -145,9 +145,11 @@ class MyCanvasBase(glcanvas.GLCanvas):
     def OnMouseDown(self, evt):
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
+        return
 
     def OnMouseUp(self, evt):
         self.ReleaseMouse()
+        return
 
     def OnMouseMotion(self, evt):
         if evt.Dragging() and evt.LeftIsDown():

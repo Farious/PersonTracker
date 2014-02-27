@@ -64,7 +64,7 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         self.i = 0
         self.speed = 10  # Frames-per-second
         self.dFrame = 0  # Delta of frames since last update
-
+        self.rank = 10
         #/---------------------------------------------------------------------
         # Configuring the three OpenGL windows:
         # Video Stream;
@@ -113,8 +113,8 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
                         canvas.loadImage(canvas.image)
                         canvas.OnSize(event)
                         canvas.OnDraw()
-        event.Skip()
         self.Layout()
+        event.Skip()
         return
 
     def update_ui( self, event ):
@@ -188,13 +188,23 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
         frame_name = all_frames[frame_nr]
 
-        frame = self.fio.load_image_print_text(cam_name, frame_name, self.chkbox_show_det.Value, self.chkbox_show_reid.Value)
+        threshold = 0
+        if isfloat(self.thrshValue.Value):
+            threshold = float(self.thrshValue.Value)
+
+        frame = self.fio.load_image_print_text(cam_name, frame_name,
+                                               self.chkbox_show_det.Value,
+                                               self.chkbox_show_reid.Value,
+                                               self.chkbox_show_selected.Value,
+                                               PDthreshold=threshold,
+                                               rank=self.rank
+                                               )
 
         if frame != None:
             self.stream_canvas.loadImage(frame)
             frame_nr += 1
 
-        if frame_nr >= len(sel_vid["camera60"]):
+        if frame_nr >= len(sel_vid[cam_name]):
             frame_nr = 0
 
         self.fio.current_frame = frame_nr
@@ -230,7 +240,7 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
     def videoSelectionUpdate(self, event):
         """
         """
-        self.fio.video_input_from_chklist(self.videoChkList.GetChecked())
+        self.fio.video_input_from_chklist([self.videoChkList.CurrentSelection])
         return
 
     def updateCheckList(self, event):
@@ -277,6 +287,13 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         self.speed = 1000. / self.fps_slider.GetValue()
         if self.glTimer.IsRunning():
             self.glTimer.Start(self.speed)
+
+        self.actual_fps.SetLabelText("[" + str(self.fps_slider.GetValue()) + "]")
+        return
+
+    def update_rank( self, event ):
+        self.rank = self.rank_slider.GetValue()
+        self.actual_rank.SetLabelText("[" + str(self.rank_slider.GetValue()) + "]")
         return
 
     def deactivate_reid( self, event ):

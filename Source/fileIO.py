@@ -108,7 +108,7 @@ class FileIO:
                 detection = Detection(det[0], det[1], det[2], det[3], det[4], det[5], det[6:])
                 result[i] = detection.return_dict()
             else:
-                detection = Detection(det[0], det[1], det[2], det[3], det[4], -1, [])
+                detection = Detection(det[0], det[1], det[2], det[3], det[4], 0, [])
                 result[i] = detection.return_dict()
 
         return result
@@ -142,7 +142,7 @@ class FileIO:
                 for det in cam[frame]:
                     for m_id in checked_ids:
                         r_id = self.person_ids[m_id]
-                        if r_id in det['ids']:
+                        if r_id in det['ids'] + [det['real_id']]:
                             res_frame.append(r_id)
                 if res_frame:
                     result[camera][frame] = res_frame
@@ -152,8 +152,7 @@ class FileIO:
                 result[cam][frame].sort()
                 result[cam][frame] = remove_duplicates(result[cam][frame])
 
-        self.selected_persons = result  # {"cam_name_1": {"frame_1": id_1, ...}, "cam_name_2": {...} ...}
-
+        self.selected_persons = result  # {"cam_name_1": {"frame_1": [id_1, ...], ...}, "cam_name_2": {...} ...}
         # Update which frames to show in the stream
         self.frames_to_show()
         return
@@ -238,7 +237,9 @@ class FileIO:
 
         return result
 
-    def load_image_print_text(self, cam, frame, showPD=1, showREID=1, debugREID=1, debugPD=0, PDthreshold=-1):
+    def load_image_print_text(self, cam, frame, showPD=1, showREID=1,
+                              showOnlySelection=False, debugREID=1,
+                              debugPD=0, PDthreshold=-1, rank = 10):
         """
         :param cam:
         :param frame:
@@ -269,7 +270,9 @@ class FileIO:
         smalltextHeight = 16 * fontScale  # 50 for cv2.FONT_HERSHEY_DUPLEX in cam60 image sizes
         smallletterWidth = 13 * fontScale
 
-        for det in self.det_list[cam][frame]:
+        det_list = self.det_list
+
+        for det in det_list[cam][frame]:
             confidence = det['confidence']
             left = det['left']
             top = det['top']
@@ -278,10 +281,26 @@ class FileIO:
             real_id = det['real_id']
             det_ids = det['ids']
 
+            exists = cam in self.selected_persons.keys()
+            if exists:
+                exists = frame in self.selected_persons[cam].keys()
+            if exists:
+                exists = real_id in self.selected_persons[cam][frame]
+
+            if showOnlySelection and not exists:
+                continue
+
             if confidence < PDthreshold:  # Don't print anything, neither detection or RE-ID
                 continue
 
             confidence = str(confidence)
+
+            if real_id != -1 and showREID:  # There is a re-IDentification for this detection
+                correctID = real_id
+                REIDs = det_ids
+
+                if not correctID in REIDs[:rank]:
+                    continue
 
             ## Coordinate frame is (x,y) starting at top-left corner
             ## cv2.rectangle(img, pt1, pt2, color[, thickness[, lineType[, shift]]])
@@ -298,6 +317,9 @@ class FileIO:
                 correctID = real_id
                 REIDs = det_ids
 
+                if not correctID in REIDs[:rank]:
+                    continue
+
                 ## Given a list of names, put one white box for each, on top of the image, and print the text on each respective
                 # whitebox
 
@@ -311,7 +333,7 @@ class FileIO:
                     if ID == 32:
                         texts[k] = str(k + 1) + ".Dario"
 
-                for k, ID in enumerate(REIDs):
+                for k, ID in enumerate(REIDs[:rank]):
                     text = texts[k]
                     j = k
                     # in thickness CV_FILLED is -1

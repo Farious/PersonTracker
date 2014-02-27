@@ -31,3 +31,16 @@ def remove_duplicates(seq):
     seen = set()
     seen_add = seen.add
     return [x for x in seq if x not in seen and not seen_add(x)]
+
+
+def isfloat(value):
+    """
+    Checks if it is float.
+    As seen in:
+    http://stackoverflow.com/a/20929983
+    """
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False

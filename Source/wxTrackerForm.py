@@ -23,24 +23,28 @@ rocTimer = 1003
 class TrackerMainFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 743,635 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 605,456 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
 		bSizer7 = wx.BoxSizer( wx.VERTICAL )
 		
 		self.notebookPanel = wx.aui.AuiNotebook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.aui.AUI_NB_TAB_SPLIT )
+		self.notebookPanel.SetMinSize( wx.Size( 640,480 ) )
+		
 		self.trackerTab = wx.Panel( self.notebookPanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer8 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		self.m_splitter2 = wx.SplitterWindow( self.trackerTab, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_BORDER )
+		self.m_splitter2.SetSashSize( 2 )
 		self.m_splitter2.Bind( wx.EVT_IDLE, self.m_splitter2OnIdle )
+		self.m_splitter2.SetMinimumPaneSize( 100 )
 		
 		self.m_panel14 = wx.Panel( self.m_splitter2, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		playerBox = wx.BoxSizer( wx.VERTICAL )
 		
 		self.glPanel = wx.Panel( self.m_panel14, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
-		playerBox.Add( self.glPanel, 8, wx.EXPAND |wx.ALL, 5 )
+		playerBox.Add( self.glPanel, 8, wx.ALL|wx.EXPAND, 5 )
 		
 		playerBtnBox = wx.BoxSizer( wx.HORIZONTAL )
 		
@@ -84,46 +88,92 @@ class TrackerMainFrame ( wx.Frame ):
 		self.personCheckList = wx.CheckListBox( self.m_panel11, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, personCheckListChoices, wx.LB_ALWAYS_SB )
 		self.personCheckList.SetMinSize( wx.Size( 100,50 ) )
 		
-		personSelBox.Add( self.personCheckList, 2, wx.ALL|wx.EXPAND, 5 )
+		personSelBox.Add( self.personCheckList, 2, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		
-		expansionBox.Add( personSelBox, 2, wx.ALL|wx.EXPAND, 5 )
+		expansionBox.Add( personSelBox, 2, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		videoSelBox = wx.StaticBoxSizer( wx.StaticBox( self.m_panel11, wx.ID_ANY, u"Video Selection" ), wx.VERTICAL )
 		
 		videoChkListChoices = []
-		self.videoChkList = wx.CheckListBox( self.m_panel11, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, videoChkListChoices, wx.LB_ALWAYS_SB )
-		self.videoChkList.SetMinSize( wx.Size( 100,50 ) )
+		self.videoChkList = wx.Choice( self.m_panel11, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, videoChkListChoices, 0 )
+		self.videoChkList.SetSelection( 0 )
+		self.videoChkList.SetMinSize( wx.Size( 100,25 ) )
 		
-		videoSelBox.Add( self.videoChkList, 2, wx.ALL|wx.EXPAND, 5 )
+		videoSelBox.Add( self.videoChkList, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		
-		expansionBox.Add( videoSelBox, 2, wx.ALL|wx.EXPAND, 5 )
+		expansionBox.Add( videoSelBox, 0, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		propertiesSizer = wx.StaticBoxSizer( wx.StaticBox( self.m_panel11, wx.ID_ANY, u"Properties" ), wx.VERTICAL )
 		
+		bSizer71 = wx.BoxSizer( wx.HORIZONTAL )
+		
 		self.chkbox_show_det = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Show detections", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.chkbox_show_det.SetValue(True) 
-		propertiesSizer.Add( self.chkbox_show_det, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		bSizer71.Add( self.chkbox_show_det, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.thrshValue = wx.TextCtrl( self.m_panel11, wx.ID_ANY, u"Threshold Value", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer71.Add( self.thrshValue, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		propertiesSizer.Add( bSizer71, 1, wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		
+		bSizer81 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		self.chkbox_show_reid = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Show re-identifications", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.chkbox_show_reid.SetValue(True) 
-		propertiesSizer.Add( self.chkbox_show_reid, 0, wx.ALL, 5 )
+		bSizer81.Add( self.chkbox_show_reid, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_staticText11 = wx.StaticText( self.m_panel11, wx.ID_ANY, u"1", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText11.Wrap( -1 )
+		bSizer81.Add( self.m_staticText11, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.rank_slider = wx.Slider( self.m_panel11, wx.ID_ANY, 10, 1, 10, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
+		bSizer81.Add( self.rank_slider, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_staticText21 = wx.StaticText( self.m_panel11, wx.ID_ANY, u"10", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText21.Wrap( -1 )
+		bSizer81.Add( self.m_staticText21, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.actual_rank = wx.StaticText( self.m_panel11, wx.ID_ANY, u"[1]", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.actual_rank.Wrap( -1 )
+		bSizer81.Add( self.actual_rank, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		propertiesSizer.Add( bSizer81, 1, wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
 		
 		self.chkbox_show_selected = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Show frames with selected detections", wx.DefaultPosition, wx.DefaultSize, 0 )
-		propertiesSizer.Add( self.chkbox_show_selected, 0, wx.ALL, 5 )
+		propertiesSizer.Add( self.chkbox_show_selected, 1, wx.ALL|wx.EXPAND, 5 )
 		
 		
-		expansionBox.Add( propertiesSizer, 1, wx.EXPAND|wx.ALL, 5 )
+		expansionBox.Add( propertiesSizer, 0, wx.ALL|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		
+		sbSizer4 = wx.StaticBoxSizer( wx.StaticBox( self.m_panel11, wx.ID_ANY, u"Frames per second" ), wx.HORIZONTAL )
+		
+		self.m_staticText1 = wx.StaticText( self.m_panel11, wx.ID_ANY, u"1", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText1.Wrap( -1 )
+		sbSizer4.Add( self.m_staticText1, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
 		
 		self.fps_slider = wx.Slider( self.m_panel11, wx.ID_ANY, 1, 1, 120, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
-		expansionBox.Add( self.fps_slider, 0, wx.ALL|wx.EXPAND, 5 )
+		sbSizer4.Add( self.fps_slider, 1, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.m_staticText2 = wx.StaticText( self.m_panel11, wx.ID_ANY, u"120", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.m_staticText2.Wrap( -1 )
+		sbSizer4.Add( self.m_staticText2, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		self.actual_fps = wx.StaticText( self.m_panel11, wx.ID_ANY, u"[1]", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.actual_fps.Wrap( -1 )
+		sbSizer4.Add( self.actual_fps, 0, wx.ALL|wx.ALIGN_CENTER_VERTICAL, 5 )
+		
+		
+		expansionBox.Add( sbSizer4, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.EXPAND|wx.ALL, 5 )
 		
 		
 		self.m_panel11.SetSizer( expansionBox )
 		self.m_panel11.Layout()
 		expansionBox.Fit( self.m_panel11 )
-		self.m_splitter2.SplitVertically( self.m_panel14, self.m_panel11, 0 )
+		self.m_splitter2.SplitVertically( self.m_panel14, self.m_panel11, 500 )
 		bSizer8.Add( self.m_splitter2, 1, wx.ALIGN_CENTER_VERTICAL|wx.ALL|wx.EXPAND, 5 )
 		
 		
@@ -193,11 +243,12 @@ class TrackerMainFrame ( wx.Frame ):
 		self.personCheckList.Bind( wx.EVT_CHECKLISTBOX, self.personSelectionUpdate )
 		self.personCheckList.Bind( wx.EVT_KEY_DOWN, self.chkListKeyDown )
 		self.personCheckList.Bind( wx.EVT_KEY_UP, self.chkListKeyUp )
-		self.videoChkList.Bind( wx.EVT_CHECKLISTBOX, self.videoSelectionUpdate )
-		self.videoChkList.Bind( wx.EVT_KEY_DOWN, self.chkListKeyDown )
-		self.videoChkList.Bind( wx.EVT_KEY_UP, self.chkListKeyUp )
+		self.videoChkList.Bind( wx.EVT_CHOICE, self.videoSelectionUpdate )
 		self.chkbox_show_det.Bind( wx.EVT_CHECKBOX, self.deactivate_reid )
+		self.rank_slider.Bind( wx.EVT_SCROLL_CHANGED, self.update_rank )
+		self.rank_slider.Bind( wx.EVT_SCROLL_THUMBTRACK, self.update_rank )
 		self.fps_slider.Bind( wx.EVT_SCROLL_CHANGED, self.update_fps )
+		self.fps_slider.Bind( wx.EVT_SCROLL_THUMBTRACK, self.update_fps )
 		self.Bind( wx.EVT_TIMER, self.updateStreamImage, id=MainTimer )
 		self.Bind( wx.EVT_TIMER, self.updateStatPanel, id=statsTimer )
 		self.Bind( wx.EVT_TIMER, self.updateCheckList, id=checkListTimer )
@@ -250,13 +301,16 @@ class TrackerMainFrame ( wx.Frame ):
 	def videoSelectionUpdate( self, event ):
 		event.Skip()
 	
-	
-	
 	def deactivate_reid( self, event ):
 		event.Skip()
 	
+	def update_rank( self, event ):
+		event.Skip()
+	
+	
 	def update_fps( self, event ):
 		event.Skip()
+	
 	
 	def updateStreamImage( self, event ):
 		event.Skip()
@@ -277,7 +331,7 @@ class TrackerMainFrame ( wx.Frame ):
 		event.Skip()
 	
 	def m_splitter2OnIdle( self, event ):
-		self.m_splitter2.SetSashPosition( 0 )
+		self.m_splitter2.SetSashPosition( 500 )
 		self.m_splitter2.Unbind( wx.EVT_IDLE )
 	
 
