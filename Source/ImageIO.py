@@ -28,6 +28,8 @@ class ImageIO:
 
         if imArray != None:
             self.image = imArray
+        else:
+            print "Failed reading image name: " + filename
 
     def returnImage(self):
         return self.image

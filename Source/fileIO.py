@@ -221,6 +221,14 @@ class FileIO:
 
         return
 
+    def retrieve_frame_from_cam(self, cam, frame):
+        result = []
+
+        file_path = join(self.videos_dir, cam, frame + ".jpeg")
+        self.iio.loadImage(file_path)
+        result = self.iio.returnImage()
+
+        return result
 
 if __name__ == "__main__":
     fio = FileIO()
@@ -231,3 +239,5 @@ if __name__ == "__main__":
     print "c", fio.retrieve_det_persons()
     print "d", fio.det_list
     print "e", fio.camera_list
+
+    print fio.retrieve_frame_from_cam("camera60", "I00009")

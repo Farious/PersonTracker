@@ -226,12 +226,12 @@ class QuadCanvas(MyCanvasBase):
         if not self.initTexture:
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
             glBindTexture(GL_TEXTURE_2D, self.imageID)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, self.image)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_BGR, GL_UNSIGNED_BYTE, self.image)
             self.setupTexture()
         else:
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
             glBindTexture(GL_TEXTURE_2D, self.imageID)
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, self.image)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ix, iy, 0, GL_BGR, GL_UNSIGNED_BYTE, self.image)
             self.setupTexture()
 
         glUseProgram(self.program)

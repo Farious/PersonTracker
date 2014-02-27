@@ -62,6 +62,8 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         self.fio = FileIO()
         self.refresh = False
         self.i = 0
+        self.speed = 1000./60
+        self.dt = 0
 
         #/---------------------------------------------------------------------
         # Configuring the three OpenGL windows:
@@ -113,6 +115,11 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
                         canvas.OnDraw()
         event.Skip()
         self.Layout()
+        return
+
+    def update_ui( self, event ):
+        self.Layout()
+        return
 
     # """
     # wxPython Buttons - Main Tracker Tab - We need to implement the "video" management buttons.
@@ -165,6 +172,32 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
     def updateStreamImage(self, event):
         """
         """
+        frame_nr = self.fio.current_frame
+        sel_vid = self.fio.selected_videos
+
+        if sel_vid == {}:
+            return
+
+        if frame_nr == -1:
+            frame_nr = 0
+
+        cam_name = sel_vid.keys()[0]
+
+        all_frames = sel_vid[cam_name].keys()
+        all_frames.sort()
+
+        frame_name = all_frames[frame_nr]
+
+        frame = self.fio.retrieve_frame_from_cam(cam_name, frame_name)
+
+        if frame != None:
+            self.stream_canvas.loadImage(frame)
+            frame_nr += 1
+
+        if frame_nr >= len(sel_vid["camera60"]):
+            frame_nr = -1
+
+        self.fio.current_frame = frame_nr
         event.Skip()
         return
 
@@ -241,7 +274,7 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
 
 if __name__ == "__main__":
-    debug = False
+    debug = True
     # WX Mandatory App creation
     app = MyApp(debug)
 
