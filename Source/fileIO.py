@@ -80,7 +80,10 @@ class FileIO:
             # For each folder create an dictionary entry with the video name, frame number and detections in it
             if not isfile(join(self.detection_dir, f)):
                 self.det_list[f] = {}
-                for det in listdir(join(self.detection_dir, f)):
+                det_list = listdir(join(self.detection_dir, f))
+                det_list.sort()
+                print det_list
+                for det in det_list:
                     self.det_list[f][det.split('.')[0]] = self.__process_det_file(join(self.detection_dir, f, det))
         return
 
@@ -100,8 +103,12 @@ class FileIO:
             result.append(aux)
 
         for i, det in enumerate(result):
-            detection = Detection(det[0], det[1], det[2], det[3], det[4], det[5], det[6:])
-            result[i] = detection.return_dict()
+            if len(det) > 5:
+                detection = Detection(det[0], det[1], det[2], det[3], det[4], det[5], det[6:])
+                result[i] = detection.return_dict()
+            else:
+                detection = Detection(det[0], det[1], det[2], det[3], det[4], -1, [])
+                result[i] = detection.return_dict()
 
         return result
 
