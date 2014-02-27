@@ -10,7 +10,7 @@ cam = 60
 frame = 26
 debugREID = 1
 
-img = f.loadImagePrintText(cam, frame, debugREID=1, debugPD=1)
+img = f.loadImagePrintText(cam, frame, debugREID=0, debugPD=1, PDthreshold=20)
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("1", 2560 / 4, 1600 / 4)
