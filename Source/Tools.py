@@ -12,34 +12,15 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
-
 __author__ = 'Fábio'
 
-import cv2
 
-
-class ImageIO:
-    def __init__(self):
-        self.image = 0
-        self.imageID = ''
-
-    def loadImage(self, filename):
-        imArray = cv2.imread(filename)
-
-        if imArray != None:
-            self.image = imArray
-
-    def returnImage(self):
-        return self.image
-
-    def showImage(self):
-        if self.image != None:
-            cv2.namedWindow('test', cv2.WINDOW_NORMAL)
-            cv2.imshow('test', self.image)
-            cv2.waitKey(0)
-
-
-if __name__ == "__main__":
-    io = ImageIO()
-    io.loadImage('./RESOURCES/tree.jpg')
-    io.showImage()
+def remove_duplicates(seq):
+    """
+    Removes duplicates from a list.
+    As seen in:
+    http://stackoverflow.com/a/480227
+    """
+    seen = set()
+    seen_add = seen.add
+    return [x for x in seq if x not in seen and not seen_add(x)]
