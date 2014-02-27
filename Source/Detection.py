@@ -21,10 +21,10 @@ class Detection:
     """
 
     def __init__(self, left, top, width, height, confidence, real, ids):
-        self.left = left
-        self.top = top
-        self.right = left + width
-        self.bottom = top + height
+        self.left = int(left)
+        self.top = int(top)
+        self.right = int(left + width)
+        self.bottom = int(top + height)
         self.confidence = confidence
         self.real_id = int(real)
         self.ids = [int(id) for id in ids]

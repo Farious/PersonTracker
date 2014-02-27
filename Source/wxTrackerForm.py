@@ -23,7 +23,7 @@ rocTimer = 1003
 class TrackerMainFrame ( wx.Frame ):
 	
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 743,525 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size = wx.Size( 743,635 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
@@ -100,8 +100,24 @@ class TrackerMainFrame ( wx.Frame ):
 		
 		expansionBox.Add( videoSelBox, 2, wx.ALL|wx.EXPAND, 5 )
 		
-		self.m_checkBox2 = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Show frames with selected detections", wx.DefaultPosition, wx.DefaultSize, 0 )
-		expansionBox.Add( self.m_checkBox2, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		propertiesSizer = wx.StaticBoxSizer( wx.StaticBox( self.m_panel11, wx.ID_ANY, u"Properties" ), wx.VERTICAL )
+		
+		self.chkbox_show_det = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Show detections", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.chkbox_show_det.SetValue(True) 
+		propertiesSizer.Add( self.chkbox_show_det, 1, wx.ALL|wx.EXPAND|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+		
+		self.chkbox_show_reid = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Show re-identifications", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.chkbox_show_reid.SetValue(True) 
+		propertiesSizer.Add( self.chkbox_show_reid, 0, wx.ALL, 5 )
+		
+		self.chkbox_show_selected = wx.CheckBox( self.m_panel11, wx.ID_ANY, u"Show frames with selected detections", wx.DefaultPosition, wx.DefaultSize, 0 )
+		propertiesSizer.Add( self.chkbox_show_selected, 0, wx.ALL, 5 )
+		
+		
+		expansionBox.Add( propertiesSizer, 1, wx.EXPAND|wx.ALL, 5 )
+		
+		self.fps_slider = wx.Slider( self.m_panel11, wx.ID_ANY, 1, 1, 120, wx.DefaultPosition, wx.DefaultSize, wx.SL_HORIZONTAL )
+		expansionBox.Add( self.fps_slider, 0, wx.ALL|wx.EXPAND, 5 )
 		
 		
 		self.m_panel11.SetSizer( expansionBox )
@@ -127,7 +143,7 @@ class TrackerMainFrame ( wx.Frame ):
 		self.Layout()
 		self.glTimer = wx.Timer()
 		self.glTimer.SetOwner( self, MainTimer )
-		self.glTimer.Start( 50 )
+		self.glTimer.Start( 1000 )
 		
 		self.updateStatTimer = wx.Timer()
 		self.updateStatTimer.SetOwner( self, statsTimer )
@@ -167,13 +183,21 @@ class TrackerMainFrame ( wx.Frame ):
 		self.Bind( wx.EVT_PAINT, self.reDraw )
 		self.Bind( wx.EVT_SIZE, self.reDraw )
 		self.Bind( wx.EVT_UPDATE_UI, self.update_ui )
+		self.rewBtn.Bind( wx.EVT_BUTTON, self.rewindBtnClick )
+		self.prevFrameBtn.Bind( wx.EVT_BUTTON, self.prevFrameBtnClick )
+		self.stopBtn.Bind( wx.EVT_BUTTON, self.stopBtnClick )
+		self.playBtn.Bind( wx.EVT_BUTTON, self.playBtnClick )
+		self.pauseBtn.Bind( wx.EVT_BUTTON, self.pauseBtnClick )
+		self.nextFrameBtn.Bind( wx.EVT_BUTTON, self.nextFrameBtnClick )
+		self.forwardBtn.Bind( wx.EVT_BUTTON, self.forwardBtnClick )
 		self.personCheckList.Bind( wx.EVT_CHECKLISTBOX, self.personSelectionUpdate )
 		self.personCheckList.Bind( wx.EVT_KEY_DOWN, self.chkListKeyDown )
 		self.personCheckList.Bind( wx.EVT_KEY_UP, self.chkListKeyUp )
 		self.videoChkList.Bind( wx.EVT_CHECKLISTBOX, self.videoSelectionUpdate )
 		self.videoChkList.Bind( wx.EVT_KEY_DOWN, self.chkListKeyDown )
 		self.videoChkList.Bind( wx.EVT_KEY_UP, self.chkListKeyUp )
-		self.m_checkBox2.Bind( wx.EVT_CHECKBOX, self.show_det_only )
+		self.chkbox_show_det.Bind( wx.EVT_CHECKBOX, self.deactivate_reid )
+		self.fps_slider.Bind( wx.EVT_SCROLL_CHANGED, self.update_fps )
 		self.Bind( wx.EVT_TIMER, self.updateStreamImage, id=MainTimer )
 		self.Bind( wx.EVT_TIMER, self.updateStatPanel, id=statsTimer )
 		self.Bind( wx.EVT_TIMER, self.updateCheckList, id=checkListTimer )
@@ -193,6 +217,27 @@ class TrackerMainFrame ( wx.Frame ):
 	def update_ui( self, event ):
 		event.Skip()
 	
+	def rewindBtnClick( self, event ):
+		event.Skip()
+	
+	def prevFrameBtnClick( self, event ):
+		event.Skip()
+	
+	def stopBtnClick( self, event ):
+		event.Skip()
+	
+	def playBtnClick( self, event ):
+		event.Skip()
+	
+	def pauseBtnClick( self, event ):
+		event.Skip()
+	
+	def nextFrameBtnClick( self, event ):
+		event.Skip()
+	
+	def forwardBtnClick( self, event ):
+		event.Skip()
+	
 	def personSelectionUpdate( self, event ):
 		event.Skip()
 	
@@ -207,7 +252,10 @@ class TrackerMainFrame ( wx.Frame ):
 	
 	
 	
-	def show_det_only( self, event ):
+	def deactivate_reid( self, event ):
+		event.Skip()
+	
+	def update_fps( self, event ):
 		event.Skip()
 	
 	def updateStreamImage( self, event ):

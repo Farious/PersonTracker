@@ -13,7 +13,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 __author__ = 'Fábio'
+#/-----------------------------------------------------------------------------
+# System imports
+from os import listdir
+from os.path import isfile, join
 
+#/-----------------------------------------------------------------------------
+# Our imports
+import ImageIO
 
 def remove_duplicates(seq):
     """

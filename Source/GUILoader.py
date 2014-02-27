@@ -62,8 +62,8 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         self.fio = FileIO()
         self.refresh = False
         self.i = 0
-        self.speed = 1000./60
-        self.dt = 0
+        self.speed = 10  # Frames-per-second
+        self.dFrame = 0  # Delta of frames since last update
 
         #/---------------------------------------------------------------------
         # Configuring the three OpenGL windows:
@@ -146,12 +146,14 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         """
         Define the behaviour for the "play" button
         """
+        self.glTimer.Start(self.speed)
         event.Skip()
 
     def pauseBtnClick(self, event):
         """
         Define the behaviour for the "pause" button
         """
+        self.glTimer.Stop()
         event.Skip()
 
     def nextFrameBtnClick(self, event):
@@ -176,10 +178,8 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         sel_vid = self.fio.selected_videos
 
         if sel_vid == {}:
+            self.dFrame = 0
             return
-
-        if frame_nr == -1:
-            frame_nr = 0
 
         cam_name = sel_vid.keys()[0]
 
@@ -188,16 +188,17 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
 
         frame_name = all_frames[frame_nr]
 
-        frame = self.fio.retrieve_frame_from_cam(cam_name, frame_name)
+        frame = self.fio.load_image_print_text(cam_name, frame_name, self.chkbox_show_det.Value, self.chkbox_show_reid.Value)
 
         if frame != None:
             self.stream_canvas.loadImage(frame)
             frame_nr += 1
 
         if frame_nr >= len(sel_vid["camera60"]):
-            frame_nr = -1
+            frame_nr = 0
 
         self.fio.current_frame = frame_nr
+
         event.Skip()
         return
 
@@ -272,6 +273,15 @@ class CalcFrame(wxTrackerForm.TrackerMainFrame):
         event.Skip()
         return
 
+    def update_fps( self, event ):
+        self.speed = 1000. / self.fps_slider.GetValue()
+        if self.glTimer.IsRunning():
+            self.glTimer.Start(self.speed)
+        return
+
+    def deactivate_reid( self, event ):
+        self.chkbox_show_reid.Enabled = self.chkbox_show_det.Value
+        return
 
 if __name__ == "__main__":
     debug = True

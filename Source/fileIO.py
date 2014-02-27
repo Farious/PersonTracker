@@ -17,6 +17,7 @@ __author__ = 'Fábio'
 # System imports
 from os import listdir
 from os.path import isfile, join
+import cv2
 
 #/-----------------------------------------------------------------------------
 # Our imports
@@ -82,7 +83,7 @@ class FileIO:
                 self.det_list[f] = {}
                 det_list = listdir(join(self.detection_dir, f))
                 det_list.sort()
-                print det_list
+
                 for det in det_list:
                     self.det_list[f][det.split('.')[0]] = self.__process_det_file(join(self.detection_dir, f, det))
         return
@@ -237,6 +238,98 @@ class FileIO:
 
         return result
 
+    def load_image_print_text(self, cam, frame, showPD=1, showREID=1, debugREID=1, debugPD=0, PDthreshold=-1):
+        """
+        :param cam:
+        :param frame:
+        :param debugREID:
+        """
+        ## Pre-defined static variables
+        CV_FILLED = -1
+        red = (0, 0, 255)
+        green = (0, 255, 0)
+        black = (0, 0, 0)
+        white = (255, 255, 255)
+        thickness = 8
+
+        file_path = join(self.videos_dir, cam, frame + ".jpeg")
+        self.iio.loadImage(file_path)
+        image = self.iio.returnImage()
+
+        if showPD == 0:  # Don't print anything in image, just return the RAW
+            return image
+
+        if image.shape[1] > 2000 :
+            fontScale = 2  # 2 for Camera 60 (4MPixel), 1 for other cameras (1MPixel)
+        else:
+            fontScale = 1
+
+        textHeight = 25 * fontScale  # 50 for cv2.FONT_HERSHEY_DUPLEX in cam60 image sizes
+        letterWidth = 18 * fontScale
+        smalltextHeight = 16 * fontScale  # 50 for cv2.FONT_HERSHEY_DUPLEX in cam60 image sizes
+        smallletterWidth = 13 * fontScale
+
+        for det in self.det_list[cam][frame]:
+            confidence = det['confidence']
+            left = det['left']
+            top = det['top']
+            right = det['right']
+            bottom = det['bottom']
+            real_id = det['real_id']
+            det_ids = det['ids']
+
+            if confidence < PDthreshold:  # Don't print anything, neither detection or RE-ID
+                continue
+
+            confidence = str(confidence)
+
+            ## Coordinate frame is (x,y) starting at top-left corner
+            ## cv2.rectangle(img, pt1, pt2, color[, thickness[, lineType[, shift]]])
+            cv2.rectangle(image, (left, top), (right, bottom), red, thickness)
+
+            if debugPD:
+                cv2.rectangle(image, (left, bottom),
+                              (left + smallletterWidth * len(confidence), bottom + smalltextHeight + fontScale), white,
+                              CV_FILLED)
+                cv2.putText(image, confidence, (left, bottom + smalltextHeight), cv2.FONT_HERSHEY_COMPLEX_SMALL, fontScale,
+                            color=black, thickness=thickness / 2)
+
+            if real_id != -1 and showREID:  # There is a re-IDentification for this detection
+                correctID = real_id
+                REIDs = det_ids
+
+                ## Given a list of names, put one white box for each, on top of the image, and print the text on each respective
+                # whitebox
+
+                # Standard person names are PersonXXX
+                texts = [str(k + 1) + ".Person" + str(ID).zfill(3) for k, ID in enumerate(REIDs)]
+                # But for a few select persons that we do know their first name, we can re-name the text to their names
+                # It would probably be nicer if made in a single cycle
+                for k, ID in enumerate(REIDs):
+                    if ID == 22:
+                        texts[k] = str(k + 1) + ".Matteo"
+                    if ID == 32:
+                        texts[k] = str(k + 1) + ".Dario"
+
+                for k, ID in enumerate(REIDs):
+                    text = texts[k]
+                    j = k
+                    # in thickness CV_FILLED is -1
+                    # +fontScale to give a little white margin on the bottom
+                    cv2.rectangle(image, (left, top - textHeight * j + fontScale),
+                                  (left + letterWidth * len(text), top - textHeight * (j + 1)), white, CV_FILLED)
+                    if ID == correctID:
+                        color = green
+                    else:
+                        color = red
+                    if debugREID == 0:
+                        color = black
+                    cv2.putText(image, text, (left, top - textHeight * j), cv2.FONT_HERSHEY_DUPLEX, fontScale, color,
+                                thickness=thickness / 2)
+
+        return image
+
+
 if __name__ == "__main__":
     fio = FileIO()
     fio.update_lists()
@@ -247,4 +340,4 @@ if __name__ == "__main__":
     print "d", fio.det_list
     print "e", fio.camera_list
 
-    print fio.retrieve_frame_from_cam("camera60", "I00009")
+    # print fio.retrieve_frame_from_cam("camera60", "I00009")
